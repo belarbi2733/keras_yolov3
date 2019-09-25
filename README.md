@@ -17,9 +17,9 @@ A Keras implementation of YOLOv3 (Tensorflow backend) inspired by [qqwweee/keras
 
 ```
 wget https://pjreddie.com/media/files/yolov3.weights
-python convert.py yolov3.cfg yolov3.weights model_data/yolo.h5
-python yolo_test.py [OPTIONS...] --image, for image detection mode, OR
-python yolo_test.py [video_path] [output_path (optional)]
+python convert.py yolov3.cfg yolov3.weights model_data/yolo_weights.h5
+python yolo_test.py input='path_to_image' --output='yolo.jpg' --image  for image detection mode
+python yolo_test.py input='video_path' output='video_saved' --video    for video detection mode 
 ```
 
 For Tiny YOLOv3, just do in a similar way, just specify model path and anchor path with `--model model_file` and `--anchors anchor_file`.
@@ -82,7 +82,7 @@ If you want to use original pretrained weights for YOLOv3:
 ## Some issues to know
 
 1. The test environment is
-    - Python 3.5.2
+    - Python 3.5
     - Keras 2.2.0
     - tensorflow 1.9.0
 
