@@ -1,7 +1,7 @@
-""" Retrain the YOLO model for your own dataset. """ import tensorflow as tf import numpy as np import keras.backend as K from keras.layers import 
-Input, Lambda from keras.models import Model from keras.optimizers import Adam from keras.callbacks import TensorBoard, ModelCheckpoint, 
-ReduceLROnPlateau, EarlyStopping from yolo3.model import preprocess_true_boxes, yolo_body, tiny_yolo_body, yolo_loss from yolo3.utils import 
-get_random_data def get_classes(classes_path):
+""" Retrain the YOLO model for your own dataset. """ import tensorflow as tf import sys import argparse import numpy as np import keras.backend as K 
+from keras.layers import Input, Lambda from keras.models import Model from keras.optimizers import Adam from keras.callbacks import TensorBoard, 
+ModelCheckpoint, ReduceLROnPlateau, EarlyStopping from yolo3.model import preprocess_true_boxes, yolo_body, tiny_yolo_body, yolo_loss from yolo3.utils 
+import get_random_data def get_classes(classes_path):
     '''loads the classes'''
     with open(classes_path) as f:
         class_names = f.readlines()
@@ -87,42 +87,42 @@ get_random_data def get_classes(classes_path):
         '--annotation', type=str,default='annotations.csv',
         help='path to model weight file, default '
     )
-	parser.add_argument(
+    parser.add_argument(
         '--classes', type=str,default='model_data/key_classes.txt',
         help='path to model weight file, default '
     )
-	parser.add_argument(
+    parser.add_argument(
         '--anchors', type=str,default='model_data/yolo_anchors.txt',
         help='path to model weight file, default '
     )
-	parser.add_argument(
+    parser.add_argument(
         '--initial_epoch1', type=int,default=0,
         help='initial_epoch1 with frozen layers first, to get a stable loss. '
     )
-	parser.add_argument(
+    parser.add_argument(
         '--initial_epoch2', type=int,default=100,
         help='initial_epoch2 Unfreeze and continue training, to fine-tune. '
     )
-	parser.add_argument(
+    parser.add_argument(
         '--epoch1', type=int,default=100,
         help='epoch1 with frozen layers first, to get a stable loss.'
     )
-	parser.add_argument(
+    parser.add_argument(
         '--epoch2', type=int,default=200,
         help='epoch2 Unfreeze and continue training, to fine-tune. '
     )
-	parser.add_argument(
+    parser.add_argument(
         '--batch_size1', type=int,default=64,
         help='batch_size1 with frozen layers first, to get a stable loss. '
     )
-	parser.add_argument(
+    parser.add_argument(
         '--batch_size2', type=int,default=64,
         help='batch_size2 of the Unfreeze and continue training, to fine-tune. '
     )
     FLAGS = parser.parse_args()
     annotation_path = FLAGS.annotation
     log_dir = 'logs/'
-	model_results="weights_yolo_train"
+    model_results="weights_yolo_train"
     classes_path = FLAGS.classes
     anchors_path = FLAGS.anchors
     class_names = get_classes(classes_path)
@@ -160,7 +160,7 @@ get_random_data def get_classes(classes_path):
                 steps_per_epoch=max(1, num_train//batch_size),
                 validation_data=data_generator_wrapper(lines[num_train:], batch_size, input_shape, anchors, num_classes),
                 validation_steps=max(1, num_val//batch_size),
-                epochs=FLAGS.epochs1,
+                epochs=FLAGS.epoch1,
                 initial_epoch=FLAGS.initial_epoch1,
                 callbacks=[logging, checkpoint])
         model.save_weights(model_results + 'trained_weights_stage_1.h5')
@@ -176,8 +176,8 @@ get_random_data def get_classes(classes_path):
             steps_per_epoch=max(1, num_train//batch_size),
             validation_data=data_generator_wrapper(lines[num_train:], batch_size, input_shape, anchors, num_classes),
             validation_steps=max(1, num_val//batch_size),
-            epochs=FLAGS.epochs2,
-            initial_epoch=FLAGS.initial_epoch2.,
+            epochs=FLAGS.epoch2,
+            initial_epoch=FLAGS.initial_epoch2,
             callbacks=[logging, checkpoint, reduce_lr, early_stopping])
         model.save_weights(model_results + 'trained_weights_final.h5')
     # Further training if needed.
