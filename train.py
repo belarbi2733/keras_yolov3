@@ -95,6 +95,30 @@ get_random_data def get_classes(classes_path):
         '--anchors', type=str,default='model_data/yolo_anchors.txt',
         help='path to model weight file, default '
     )
+	parser.add_argument(
+        '--initial_epoch1', type=int,default=0,
+        help='initial_epoch1 with frozen layers first, to get a stable loss. '
+    )
+	parser.add_argument(
+        '--initial_epoch2', type=int,default=100,
+        help='initial_epoch2 Unfreeze and continue training, to fine-tune. '
+    )
+	parser.add_argument(
+        '--epoch1', type=int,default=100,
+        help='epoch1 with frozen layers first, to get a stable loss.'
+    )
+	parser.add_argument(
+        '--epoch2', type=int,default=200,
+        help='epoch2 Unfreeze and continue training, to fine-tune. '
+    )
+	parser.add_argument(
+        '--batch_size1', type=int,default=64,
+        help='batch_size1 with frozen layers first, to get a stable loss. '
+    )
+	parser.add_argument(
+        '--batch_size2', type=int,default=64,
+        help='batch_size2 of the Unfreeze and continue training, to fine-tune. '
+    )
     FLAGS = parser.parse_args()
     annotation_path = FLAGS.annotation
     log_dir = 'logs/'
@@ -130,14 +154,14 @@ get_random_data def get_classes(classes_path):
         model.compile(optimizer=Adam(lr=1e-3), loss={
             # use custom yolo_loss Lambda layer.
             'yolo_loss': lambda y_true, y_pred: y_pred})
-        batch_size = 64
+        batch_size = FLAGS.batch_size1
         print('Train on {} samples, val on {} samples, with batch size {}.'.format(num_train, num_val, batch_size))
         model.fit_generator(data_generator_wrapper(lines[:num_train], batch_size, input_shape, anchors, num_classes),
                 steps_per_epoch=max(1, num_train//batch_size),
                 validation_data=data_generator_wrapper(lines[num_train:], batch_size, input_shape, anchors, num_classes),
                 validation_steps=max(1, num_val//batch_size),
-                epochs=200,
-                initial_epoch=0,
+                epochs=FLAGS.epochs1,
+                initial_epoch=FLAGS.initial_epoch1,
                 callbacks=[logging, checkpoint])
         model.save_weights(model_results + 'trained_weights_stage_1.h5')
     # Unfreeze and continue training, to fine-tune. Train longer if the result is not good.
@@ -146,14 +170,14 @@ get_random_data def get_classes(classes_path):
             model.layers[i].trainable = True
         model.compile(optimizer=Adam(lr=1e-4), loss={'yolo_loss': lambda y_true, y_pred: y_pred}) # recompile to apply the change
         print('Unfreeze all of the layers.')
-        batch_size = 32 # note that more GPU memory is required after unfreezing the body
+        batch_size = FLAGS.batch_size2 # note that more GPU memory is required after unfreezing the body
         print('Train on {} samples, val on {} samples, with batch size {}.'.format(num_train, num_val, batch_size))
         model.fit_generator(data_generator_wrapper(lines[:num_train], batch_size, input_shape, anchors, num_classes),
             steps_per_epoch=max(1, num_train//batch_size),
             validation_data=data_generator_wrapper(lines[num_train:], batch_size, input_shape, anchors, num_classes),
             validation_steps=max(1, num_val//batch_size),
-            epochs=400,
-            initial_epoch=200,
+            epochs=FLAGS.epochs2,
+            initial_epoch=FLAGS.initial_epoch2.,
             callbacks=[logging, checkpoint, reduce_lr, early_stopping])
         model.save_weights(model_results + 'trained_weights_final.h5')
     # Further training if needed.
