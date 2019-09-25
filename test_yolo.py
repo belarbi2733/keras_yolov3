@@ -24,8 +24,7 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(argument_default=argparse.SUPPRESS)
     parser.add_argument('--model', type=str,
-                        help='path to model weight file, default '
-                        + YOLO.get_defaults('model_path'))
+                        help='path to model weight file, default ')
 
     parser.add_argument('--anchors', type=str,
                         help='path to anchor definitions, default '
