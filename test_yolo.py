@@ -23,14 +23,14 @@ if __name__ == '__main__':
     # class YOLO defines the default value, so suppress any default here
 
     parser = argparse.ArgumentParser(argument_default=argparse.SUPPRESS)
-    parser.add_argument('--model', type=str,
-                        help='path to model weight file, default ')
+    parser.add_argument('--model', type=str,default='weights_yolo_train/trained_weights_stage_1.h5',
+                        help='path to model weight file, default ' + YOLO.get_defaults("model_path"))
 
-    parser.add_argument('--anchors', type=str,
+    parser.add_argument('--anchors', type=str,default='model_data/yolo_anchors.txt',
                         help='path to anchor definitions, default '
                         + YOLO.get_defaults('anchors_path'))
 
-    parser.add_argument('--classes', type=str,
+    parser.add_argument('--classes', type=str,default='model_data/key_classes.txt',
                         help='path to class definitions, default '
                         + YOLO.get_defaults('classes_path'))
 
@@ -55,7 +55,7 @@ if __name__ == '__main__':
     if FLAGS.image:
         print ('Image detection mode')
         if 'input' in FLAGS:
-            detect_img(YOLO(**vars(FLAGS)), FLAGS.input, FLAGS.output)
+            detect_img(YOLO(FLAGS.classes,FLAGS.anchors,FLAGS.model), FLAGS.input, FLAGS.output)
         else:
             print ('Must specify at least image_input_path.  See usage with --help.')
     elif FLAGS.video:

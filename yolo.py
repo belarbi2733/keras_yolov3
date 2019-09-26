@@ -19,6 +19,7 @@ import os
 from keras.utils import multi_gpu_model
 
 class YOLO(object):
+
     _defaults = {
         "model_path": 'weights_yolo_train/trained_weights_stage_1.h5',
         "anchors_path": 'model_data/yolo_anchors.txt',
@@ -35,31 +36,41 @@ class YOLO(object):
             return cls._defaults[n]
         else:
             return "Unrecognized attribute name '" + n + "'"
-
-    def __init__(self, **kwargs):
-        self.__dict__.update(self._defaults) # set up default values
-        self.__dict__.update(kwargs) # and update with user overrides
-        self.class_names = self._get_class()
-        self.anchors = self._get_anchors()
-        self.sess = K.get_session()
-        self.boxes, self.scores, self.classes = self.generate()
-
-    def _get_class(self):
-        classes_path = os.path.expanduser(self.classes_path)
+    def get_class_name(self,path):
+        classes_path = os.path.expanduser(path)
         with open(classes_path) as f:
             class_names = f.readlines()
         class_names = [c.strip() for c in class_names]
         return class_names
 
-    def _get_anchors(self):
-        anchors_path = os.path.expanduser(self.anchors_path)
+    def __init__(self, class_path1,anchros_path1,model_path1):
+        self.__dict__.update(self._defaults) # set up default values
+        #self.__dict__.update(kwargs) # and update with user overrides
+        self.class_names = self._get_class_name(class_path1)
+        self.anchors = self._get_anchors(anchros_path1)
+        self.model_path = model_path1
+        self.sess = K.get_session()
+        self.boxes, self.scores, self.classes = self.generate(model_path1)
+
+    def _get_class_name(self,path):
+        classes_path = os.path.expanduser(path)
+        with open(classes_path) as f:
+            class_names = f.readlines()
+        class_names = [c.strip() for c in class_names]
+        return class_names
+
+    def _get_anchors(self,path):
+        anchors_path = path
         with open(anchors_path) as f:
             anchors = f.readline()
         anchors = [float(x) for x in anchors.split(',')]
         return np.array(anchors).reshape(-1, 2)
-
-    def generate(self):
+    def _get_model(self):
         model_path = os.path.expanduser(self.model_path)
+        return model_path
+
+    def generate(self,path):
+        model_path = path
         assert model_path.endswith('.h5'), 'Keras model or weights must be a .h5 file.'
 
         # Load model, or construct model and load weights.
