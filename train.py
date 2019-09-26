@@ -130,7 +130,8 @@ def get_classes(classes_path):
     FLAGS = parser.parse_args()
     annotation_path = FLAGS.annotation
     log_dir = 'logs/'
-    model_results="weights_yolo_train"
+    model_results="weights_yolo_train/"
+
     classes_path = FLAGS.classes
     anchors_path = FLAGS.anchors
     class_names = get_classes(classes_path)
