@@ -16,12 +16,14 @@ def get_classes(classes_path):
     with open(classes_path) as f:
         class_names = f.readlines()
     class_names = [c.strip() for c in class_names]
-    return class_names def get_anchors(anchors_path):
+    return class_names 
+def get_anchors(anchors_path):
     '''loads the anchors from a file'''
     with open(anchors_path) as f:
         anchors = f.readline()
     anchors = [float(x) for x in anchors.split(',')]
-    return np.array(anchors).reshape(-1, 2) def create_model(input_shape, anchors, num_classes, load_pretrained=True, freeze_body=2,
+    return np.array(anchors).reshape(-1, 2) 
+def create_model(input_shape, anchors, num_classes, load_pretrained=True, freeze_body=2,
             weights_path='model_data/yolo_weights.h5'):
     '''create the training model'''
     K.clear_session() # get a new session
@@ -44,7 +46,8 @@ def get_classes(classes_path):
         arguments={'anchors': anchors, 'num_classes': num_classes, 'ignore_thresh': 0.5})(
         [*model_body.output, *y_true])
     model = Model([model_body.input, *y_true], model_loss)
-    return model def create_tiny_model(input_shape, anchors, num_classes, load_pretrained=True, freeze_body=2,
+    return model 
+def create_tiny_model(input_shape, anchors, num_classes, load_pretrained=True, freeze_body=2,
             weights_path='model_data/tiny_yolo_weights.h5'):
     '''create the training model, for Tiny YOLOv3'''
     K.clear_session() # get a new session
@@ -67,7 +70,8 @@ def get_classes(classes_path):
         arguments={'anchors': anchors, 'num_classes': num_classes, 'ignore_thresh': 0.7})(
         [*model_body.output, *y_true])
     model = Model([model_body.input, *y_true], model_loss)
-    return model def data_generator(annotation_lines, batch_size, input_shape, anchors, num_classes):
+    return model 
+def data_generator(annotation_lines, batch_size, input_shape, anchors, num_classes):
     '''data generator for fit_generator'''
     n = len(annotation_lines)
     i = 0
@@ -84,10 +88,12 @@ def get_classes(classes_path):
         image_data = np.array(image_data)
         box_data = np.array(box_data)
         y_true = preprocess_true_boxes(box_data, input_shape, anchors, num_classes)
-        yield [image_data, *y_true], np.zeros(batch_size) def data_generator_wrapper(annotation_lines, batch_size, input_shape, anchors, num_classes):
+        yield [image_data, *y_true], np.zeros(batch_size) 
+def data_generator_wrapper(annotation_lines, batch_size, input_shape, anchors, num_classes):
     n = len(annotation_lines)
     if n==0 or batch_size<=0: return None
-    return data_generator(annotation_lines, batch_size, input_shape, anchors, num_classes) if __name__ == '__main__':
+    return data_generator(annotation_lines, batch_size, input_shape, anchors, num_classes) 
+if __name__ == '__main__':
     # class YOLO defines the default value, so suppress any default here
     parser = argparse.ArgumentParser(argument_default=argparse.SUPPRESS)
     '''
