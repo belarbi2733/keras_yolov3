@@ -139,7 +139,8 @@ if __name__ == '__main__':
     annotation_path = FLAGS.annotation
     log_dir = 'logs/'
     model_results="weights_yolo_train/"
-
+    if not os.path.exists(model_results): #vérification si le dossier existe 
+        os.makedirs(model_results)
     classes_path = FLAGS.classes
     anchors_path = FLAGS.anchors
     class_names = get_classes(classes_path)
