@@ -1,4 +1,5 @@
 """ Retrain the YOLO model for your own dataset. """
+import os
 import tensorflow as tf
 import sys
 import argparse
