@@ -151,10 +151,10 @@ if __name__ == '__main__':
     is_tiny_version = len(anchors)==6 # default setting
     if is_tiny_version:
         model = create_tiny_model(input_shape, anchors, num_classes,
-            freeze_body=2, weights_path='model_data/trained_weights_stage_1.h5')
+            freeze_body=2, weights_path='weights_yolo_train/trained_weights_stage_1.h5')
     else:
         model = create_model(input_shape, anchors, num_classes,
-            freeze_body=2, weights_path='model_data/trained_weights_stage_1.h5') # make sure you know what you freeze
+            freeze_body=2, weights_path='weights_yolo_train/trained_weights_stage_1.h5') # make sure you know what you freeze
     logging = TensorBoard(log_dir=log_dir)
     checkpoint = ModelCheckpoint(model_results + 'ep{epoch:03d}-loss{loss:.3f}-val_loss{val_loss:.3f}.h5',
         monitor='val_loss', save_weights_only=True, save_best_only=True, period=3)
