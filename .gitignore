@@ -1,5 +1,8 @@
 train.py
-
+train_BACKUP_22530.py
+train_BASE_22530.py
+train_LOCAL_22530.py
+train_REMOTE_22530.py
 *.jpg
 *.png
 *.weights
