@@ -24,22 +24,22 @@ This Work was applied on Keys datasets
 
 ```
 ## How it works
-###1
+	#1. Download datasets :
 	wget https://github.com/belarbi2733/keras_yolov3/releases/download/1/key_wb.zip
 	wget https://github.com/belarbi2733/keras_yolov3/releases/download/1/bckgrnd.zip
 	unzip key_wb.zip
 	unzip bckgrnd.zip
-###2
+	#2. Combine Keys with Backgrounds :
 	python keys_with_background.py --keys "key_wb" --background "bckgrnd" --output "keys_and_background"
 	mv keys_and_background/annotations.csv .
-###3
+	#3. Download YOLOv3 weights :
 	wget https://pjreddie.com/media/files/yolov3.weights
-###4
+	#4. Convert the Darknet YOLO model to a Keras model
 	python convert.py yolov3.cfg yolov3.weights model_data/yolo_weights.h5
-###5
+	#5. Run train1 and train2 :
 	python train1.py --initial_epoch1 0 --epoch1 5 --batch_size1 64  --annotation 'annotations.csv' --classes 'model_data/key_classes.txt' --anchors 'model_data/yolo_anchors.txt' 
 	python train2.py --initial_epoch2 5 --epoch2 10 --batch_size2 64 --annotation 'annotations.csv' --classes 'model_data/key_classes.txt' --anchors 'model_data/yolo_anchors.txt' 
-###6
+	#6. Run YOLO detection :
 	python test_yolo.py --image --input='keys_and_background/gen_0001.jpg' --output='yolo1.jpg' --model 'weights_yolo_train/trained_weights_final.h5' --classes 'model_data/key_classes.txt' --anchors 'model_data/yolo_anchors.txt'
 
 ###Bonus test with video	
