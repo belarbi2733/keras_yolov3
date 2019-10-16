@@ -5,21 +5,41 @@
 ## Introduction
 
 A Keras implementation of YOLOv3 (Tensorflow backend) inspired by [qqwweee/keras-yolo3](https://github.com/qqwweee/keras-yolo3).
+This Work was applied on Keys datasets
 
 
 ---
 
 ## Quick Start
-
-1. Download YOLOv3 weights from [YOLO website](http://pjreddie.com/darknet/yolo/).
-2. Convert the Darknet YOLO model to a Keras model.
-3. Run YOLO detection.
+1. Download datasets Keys without background and background images
+2. Generate the new datasets (keys combined with background)
+3. Download YOLOv3 weights from [YOLO website](http://pjreddie.com/darknet/yolo/).
+4. Convert the Darknet YOLO model to a Keras model.
+5. Run train1 and train2
+6. Run YOLO detection.
 
 ```
-wget https://pjreddie.com/media/files/yolov3.weights
-python convert.py yolov3.cfg yolov3.weights model_data/yolo_weights.h5
-python yolo_test.py input='path_to_image' --output='yolo.jpg' --image  for image detection mode
-python yolo_test.py input='video_path' output='video_saved' --video    for video detection mode 
+## How it works
+###1
+	wget https://github.com/belarbi2733/keras_yolov3/releases/download/1/key_wb.zip
+	wget https://github.com/belarbi2733/keras_yolov3/releases/download/1/bckgrnd.zip
+	unzip key_wb.zip
+	unzip bckgrnd.zip
+###2
+	python keys_with_background.py --keys "key_wb" --background "bckgrnd" --output "keys_and_background"
+	mv keys_and_background/annotations.csv .
+###3
+	wget https://pjreddie.com/media/files/yolov3.weights
+###4
+	python convert.py yolov3.cfg yolov3.weights model_data/yolo_weights.h5
+###5
+	python train1.py --initial_epoch1 0 --epoch1 5 --batch_size1 64  --annotation 'annotations.csv' --classes 'model_data/key_classes.txt' --anchors 'model_data/yolo_anchors.txt' 
+	python train2.py --initial_epoch2 5 --epoch2 10 --batch_size2 64 --annotation 'annotations.csv' --classes 'model_data/key_classes.txt' --anchors 'model_data/yolo_anchors.txt' 
+###6
+	python test_yolo.py --image --input='keys_and_background/gen_0001.jpg' --output='yolo1.jpg' --model 'weights_yolo_train/trained_weights_final.h5' --classes 'model_data/key_classes.txt' --anchors 'model_data/yolo_anchors.txt'
+
+###Bonus test with video	
+	python yolo_test.py input='video_path' output='video_saved' --video    for video detection mode 
 ```
 
 For Tiny YOLOv3, just do in a similar way, just specify model path and anchor path with `--model model_file` and `--anchors anchor_file`.
@@ -27,13 +47,13 @@ For Tiny YOLOv3, just do in a similar way, just specify model path and anchor pa
 ### Usage
 Use --help to see usage of yolo_video.py:
 ```
-usage: yolo_video.py [-h] [--model MODEL] [--anchors ANCHORS]
+usage: test_yolo.py  [-h] [--model MODEL] [--anchors ANCHORS]
                      [--classes CLASSES] [--gpu_num GPU_NUM] [--image]
                      [--input] [--output]
 
 positional arguments:
-  --input        Video input path
-  --output       Video output path
+  --input        Video or Image input path
+  --output       Video or Image output path
 
 optional arguments:
   -h, --help         show this help message and exit
@@ -42,14 +62,12 @@ optional arguments:
                      model_data/yolo_anchors.txt
   --classes CLASSES  path to class definitions, default
                      model_data/coco_classes.txt
-  --gpu_num GPU_NUM  Number of GPU to use, default 1
   --image            Image detection mode, will ignore all positional arguments
 ```
 ---
 
-4. MultiGPU usage: use `--gpu_num N` to use N GPUs. It is passed to the [Keras multi_gpu_model()](https://keras.io/utils/#multi_gpu_model).
 
-## Training
+## Explain the Training for other datasets
 
 1. Generate your own annotation file and class names file.  
     One row for one image;  
