@@ -94,7 +94,7 @@ def load_key(
 
     # Apply the rotation
 
-    rot_mtx = cv2.getRotationMatrix2D((dim // 2, dim // 2), 45, 1)
+    rot_mtx = cv2.getRotationMatrix2D((dim // 2, dim // 2), rotation, 1)
     key = cv2.warpAffine(key, rot_mtx, (dim, dim))
 
     # Find bounding box and remove what is outside
